@@ -6,18 +6,22 @@ library(dtplyr)
 library(plyr)
 library(lme4)
 
+no.of.days<-function(ver){
+  # Calculate Days
+  
+  startdate <- as.Date(as.character(ver[1]))
+  numDays <- difftime(as.Date(as.character(ver)),startdate ,units="days")
+  
+  return(as.numeric(numDays))
+}
+
+
 
 st=read.csv("C:/Users/rifat/Desktop/R_milan/githubRepo/ExperimentalData/DBpedia/DBpedia10ClassEntityCount.csv",head=T)
 
 st<-st[st$class!="dbo-place",]
 
-## Calculate Days
-fn<-function(ver){
-  startdate <- as.Date(as.character(ver[1]))
-  NumDays <- difftime(as.Date(as.character(ver)),startdate ,units="days")
-  
-  return(as.numeric(NumDays))
-}
+
 
 fnSlope <- function(xseq, yseq) { c(0, diff(xseq)/diff(yseq)) }
 
@@ -158,21 +162,21 @@ p
 
 #====================== Argon Data ============================== 
 
-AragonData=read.csv("C:/Users/rifat/Desktop/R_milan/observation.csv",head=T)
+aragonData=read.csv("./sampleData/observation.csv",head=T)
 
-entity= ddply(AragonData,.(className), here(transform), days=fn(Release))
+entity = ddply(aragonData,.(className), here(transform), days=no.of.days(Release))
 
-entity= ddply(AragonData,.(className), here(transform), days=fn(Release))
+entitySummary = ddply(entity, .(className), here(summarize),  mean=mean(count), sd=sd(count))
 
+entityNorm = entity
 
+entityNorm$countNorm=(entityNorm$count-entitySummary$mean)/entitySummary$sd
 
-
-p <- ggplot(entity, aes(x = days, y = count)) + geom_line() + geom_point()
-p <- p + labs(x = "Days", y = "Count")
+p <- ggplot(entityNorm, aes(x = days, y = countNorm)) + geom_line() + geom_point()
+p <- p + labs(x = "Days", y = "Count Normalized")
 p
 
-
-my.lm <- lm(count ~ days, data = entity)
+my.lm <- lm(countNorm ~ days, data = entityNorm)
 summary(my.lm)
 
 # Extract te coefficients from the overall model
@@ -186,7 +190,6 @@ p
 
 #for fun: Polynom, third degree: ?poly
 # how to use a polynom in a linear model
-my.lm3 <- lm(count ~ poly(days, 3), data = entity_person)
 
 p + geom_smooth(method = "lm",
                 formula = y ~ poly(x, degree = 3), 
@@ -199,11 +202,12 @@ library(segmented)
 my.seg <- segmented(my.lm, 
                     seg.Z = ~ days, 
                     psi = NA,
-                    control = seg.control(K=2))
+                    control = seg.control(K=1))
 
-my.seg <- segmented(my.lm, 
-                    seg.Z = ~ days, 
-                    psi = list(days = c(1010)))
+
+ # my.seg <- segmented(my.lm, 
+ #                      seg.Z = ~ days, 
+ #                      psi = list(days = c(1010)))
 
 # model.lm = segmented(lm(y~x,data = data),seg.Z = ~x, psi = NA, control = seg.control(K=1)
 summary(my.seg)
@@ -218,15 +222,17 @@ my.model <- data.frame(days = entity$days, count = my.fitted)
 # plot the fitted model
 ggplot(my.model, aes(x = days, y = count)) + geom_line()
 
-# add the fitted data to the exisiting plot
-p + geom_line(data = my.model, aes(x = days, y = count), colour = "tomato")
-
 # add vertical lines to indicate the break locations
 # second row of the psi-matrix
 my.lines <- my.seg$psi[, 2]
 
 p <- p + geom_vline(xintercept = my.lines, linetype = "dashed")
 p
+
+# add the fitted data to the exisiting plot
+p + geom_line(data = my.model, aes(x = days, y = count), colour = "tomato")
+
+
 
 my.slopes <- coef(my.seg)
 slope(my.seg)
