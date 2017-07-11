@@ -5,100 +5,34 @@ library(stringr)
 
 #* @get /addSchedulerIndex
 createSchedulerIndex<-function(schedulerName){
-  
-    st<-read.csv("/root/index/scheduleIndex.csv",header = T)
-    df<-data.frame(filename=schedulerName,location="/usr/local/lib/R/site-library/cronR/extdata/",
-                   saveData="/usr/local/lib/R/site-library/cronR/extdata/saveData")
-    
-    #df$filename<-schedulerName
-    #df$location<-"/usr/local/lib/R/site-library/cronR/extdata/"
-    #df$saveData<-"/usr/local/lib/R/site-library/cronR/extdata/saveData"
-    df<-rbind(st,df)
-    
-    write.csv(df,"/root/index/scheduleIndex.csv",row.names = F)
+  #* @get /readCSV
+    st<-read.csv("/root/index/scheduleIndex.csv",header = T)readCSVfiles<-function(filename){
+    df<-data.frame(filename<-schedulerName,location<-"/usr/local/lib/R/site-library/cronR/extdata/", 
+st<-read.csv(paste("/usr/local/lib/R/site-library/cronR/extdata/saveData/",filename,sep=""),header = T)
+                   saveData<-"/usr/local/lib/R/site-library/cronR/extdata/saveData")
+   df<-rbind(st,df) toJSON(st)
+      # list(p=st$p,freq=st$freq,Release=st$Release,ClassName=st$ClassName,Graph=st$Graph,Count=st$Count)
+    write.csv(df,"/root/index/scheduleIndex.csv",row.names = F)}
     rm(df)
-   
-    list(result="success")
-    
-}
-  
-#* @get /readSchedulerIndex
-createSchedulerIndex<-function(){
-  st<-read.csv("/root/index/scheduleIndex.csv",header = T)
-  toJSON(st)    
-}
-
-#* @get /updateSchedulerIndex
-createSchedulerIndex<-function(schedulerName){
-  
-  DF<-read.csv("/root/index/scheduleIndex.csv",header = T)
-  
-  ind <- which(with( DF, filename==schedulerName))
-  
-  DF <- DF[ -ind, ]
-  
-  write.csv(data.frame(DF),"/root/index/scheduleIndex.csv",row.names = F)
-  rm(DF)    
-}
-
-
-#* @get /addSchedulerIndex
-createSchedulerIndex<-function(schedulerName){
-  
-  st<-read.csv("/root/index/scheduleIndex.csv",header = T)
-  df<-data.frame(filename<-schedulerName,location<-"/usr/local/lib/R/site-library/cronR/extdata/",
-                 saveData<-"/usr/local/lib/R/site-library/cronR/extdata/saveData")
-  df<-rbind(st,df)
-  
-  write.csv(df,"/root/index/scheduleIndex.csv",row.names = F)
-  rm(df)    
 }
 
 #* @get /readSchedulerIndex
 createSchedulerIndex<-function(){
-  st<-read.csv("/root/index/scheduleIndex.csv",header = T)
-  toJSON(st)    
-}
-
-#* @get /updateSchedulerIndex
-createSchedulerIndex<-function(schedulerName){
-  
-  DF<-read.csv("/root/index/scheduleIndex.csv",header = T)
-  
-  ind <- which(with( DF, filename==schedulerName))
-  
-  DF <- DF[ -ind, ]
-  
-  write.csv(data.frame(DF),"/root/index/scheduleIndex.csv",row.names = F)
-  rm(DF)    
-}
-
-
-#* @get /readCSV
-readCSVfiles<-function(filename){
-  st<-read.csv(paste("/usr/local/lib/R/site-library/cronR/extdata/saveData/",filename,sep=""),header = T)
-  
+  st<-read.csv("/root/index/scheduleIndex.csv",header = T)#* @get /createCornJob createCornJob<-function(filename,freq,time){
   toJSON(st)
-  # list(p=st$p,freq=st$freq,Release=st$Release,ClassName=st$ClassName,Graph=st$Graph,Count=st$Count)
-}
-
-
-#* @get /createCornJob
-createCornJob<-function(filename,freq,time){
-  
-  name<-paste(filename,".R",sep = "")
+}  name<-paste(filename,".R",sep = "")
   f <- system.file(package = "cronR", "extdata", name)
   cmd <- cron_rscript(f)
-  
+ 
   
   if(freq=="minutely")
-    cron_add(cmd, frequency = 'minutely', id = filename)
-  
+  cron_add(cmd, frequency = 'minutely', id = filename)
+
   if(freq=="daily")
-    cron_add(cmd, frequency = 'daily', id = filename , at = time)
+   cron_add(cmd, frequency = 'daily', id = filename , at = time)
   if(freq=="hourly")
-    cron_add(cmd, frequency = 'hourly', id = filename)
-  
+   cron_add(cmd, frequency = 'hourly', id = filename)
+ 
   list(result="success")
 }
 
@@ -122,7 +56,7 @@ createRfile<-function(filename,className,endpoint,graph){
   # endpoint<-"http://kb.3cixty.com/sparql"
   # cln<-"dul:Place"
   # graph<-"<http://3cixty.com/nice/places>"
-  
+
   className<-gsub("#", "%23", className)
   graph<-gsub("#", "%23", graph)
   
@@ -183,7 +117,7 @@ sparlQuery_snapsots_summary_properties<-function(endpoint,className,graph){
   
   tryCatch(
     ## This is what I want to do:
-    if(graph=="NoGraph"){
+    if(is.null(graph)){
       
       query<-"SELECT ?p (COUNT(?p) as ?freq) WHERE { ?s ?p ?o. ?s a"
       query<-paste(query,className,sep = " ")
@@ -262,5 +196,5 @@ runQuery <- function(filename,className,endpoint,graph){
   df<-sparlQuery_snapsots_summary_properties(endpoint,className,graph)
   
   toJSON(df)
-  
+
 }

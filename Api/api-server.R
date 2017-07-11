@@ -6,6 +6,6 @@ library(plumber)
 
 # plumbobject <- plumb(paste(getwd(),"Api/apiServerCall.R",sep = "/"))
 
-plumbobject <- plumb("plumber/apiServerCall.R")
+plumbobject <- plumb("Api/apiServerCall.R")
 
-plumbobject$run(port=8500)
+plumbobject$run(port=9000)

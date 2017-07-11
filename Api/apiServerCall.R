@@ -3,9 +3,74 @@ library(jsonlite)
 library(cronR)
 library(stringr)
 
+#* @get /addSchedulerIndex
+createSchedulerIndex<-function(schedulerName){
+  
+    
+    st<-read.csv("/root/index/scheduleIndex.csv",header = T)
+    df<-data.frame(filename<-schedulerName,location<-"/usr/local/lib/R/site-library/cronR/extdata/",
+                   saveData<-"/usr/local/lib/R/site-library/cronR/extdata/saveData")
+    df<-rbind(st,df)
+    
+    write.csv(df,"/root/index/scheduleIndex.csv",row.names = F)
+    # rm(df)    
+}
+  
+#* @get /readSchedulerIndex
+createSchedulerIndex<-function(){
+  st<-read.csv("/root/index/scheduleIndex.csv",header = T)
+  toJSON(st)    
+}
+
+#* @get /updateSchedulerIndex
+createSchedulerIndex<-function(schedulerName){
+  
+  DF<-read.csv("/root/index/scheduleIndex.csv",header = T)
+  
+  ind <- which(with( DF, filename==schedulerName))
+  
+  DF <- DF[ -ind, ]
+  
+  write.csv(data.frame(DF),"/root/index/scheduleIndex.csv",row.names = F)
+  rm(DF)    
+}
+
+
+#* @get /addSchedulerIndex
+createSchedulerIndex<-function(schedulerName){
+  
+  st<-read.csv("/root/index/scheduleIndex.csv",header = T)
+  df<-data.frame(filename<-schedulerName,location<-"/usr/local/lib/R/site-library/cronR/extdata/",
+                 saveData<-"/usr/local/lib/R/site-library/cronR/extdata/saveData")
+  df<-rbind(st,df)
+  
+  write.csv(df,"/root/index/scheduleIndex.csv",row.names = F)
+  rm(df)    
+}
+
+#* @get /readSchedulerIndex
+createSchedulerIndex<-function(){
+  st<-read.csv("/root/index/scheduleIndex.csv",header = T)
+  toJSON(st)    
+}
+
+#* @get /updateSchedulerIndex
+createSchedulerIndex<-function(schedulerName){
+  
+  DF<-read.csv("/root/index/scheduleIndex.csv",header = T)
+  
+  ind <- which(with( DF, filename==schedulerName))
+  
+  DF <- DF[ -ind, ]
+  
+  write.csv(data.frame(DF),"/root/index/scheduleIndex.csv",row.names = F)
+  rm(DF)    
+}
+
+
 #* @get /readCSV
 readCSVfiles<-function(filename){
-  st<-read.csv(paste(getwd(),filename,sep="/"),header = T)
+  st<-read.csv(paste("/usr/local/lib/R/site-library/cronR/extdata/saveData/",filename,sep=""),header = T)
   
   toJSON(st)
   # list(p=st$p,freq=st$freq,Release=st$Release,ClassName=st$ClassName,Graph=st$Graph,Count=st$Count)
@@ -14,14 +79,20 @@ readCSVfiles<-function(filename){
 
 #* @get /createCornJob
 createCornJob<-function(filename,freq,time){
-
+  
   name<-paste(filename,".R",sep = "")
   f <- system.file(package = "cronR", "extdata", name)
   cmd <- cron_rscript(f)
-  # cmd
-  # cron_add(cmd, frequency = 'daily', id = filename , at = '14:20')
   
-  cron_add(cmd, frequency = freq, id = filename, description = 'SaveData')
+  
+  if(freq=="minutely")
+    cron_add(cmd, frequency = 'minutely', id = filename)
+  
+  if(freq=="daily")
+    cron_add(cmd, frequency = 'daily', id = filename , at = time)
+  if(freq=="hourly")
+    cron_add(cmd, frequency = 'hourly', id = filename)
+  
   list(result="success")
 }
 
@@ -42,9 +113,12 @@ deleteAllCorn<-function(){
 createRfile<-function(filename,className,endpoint,graph){
   
   # filename="/Api/yy.R"
-  # edp<-"http://kb.3cixty.com/sparql"
+  # endpoint<-"http://kb.3cixty.com/sparql"
   # cln<-"dul:Place"
   # graph<-"<http://3cixty.com/nice/places>"
+  
+  className<-gsub("#", "%23", className)
+  graph<-gsub("#", "%23", graph)
   
   file<-paste("filename=","\"",filename,".csv\"",sep="")
   end<-paste("endpoint=","\"",endpoint,"\"",sep="")
@@ -56,6 +130,10 @@ createRfile<-function(filename,className,endpoint,graph){
   cat("library(SPARQL)")
   cat("\n")
   cat("library(jsonlite)")
+  cat("\n")
+  cat("library(httr)")
+  cat("\n")
+  cat("library(RCurl)")
   cat("\n")
   cat(file)
   cat("\n")
@@ -91,7 +169,7 @@ createRfile<-function(filename,className,endpoint,graph){
   cat("\n")
   sink()
   
-  list(result=filename)
+  list(result="success")
 }
 
 
@@ -178,5 +256,5 @@ runQuery <- function(filename,className,endpoint,graph){
   df<-sparlQuery_snapsots_summary_properties(endpoint,className,graph)
   
   toJSON(df)
-
+  
 }
