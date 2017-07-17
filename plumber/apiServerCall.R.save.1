@@ -6,14 +6,20 @@ library(stringr)
 #* @get /addSchedulerIndex
 createSchedulerIndex<-function(schedulerName){
   
-    
     st<-read.csv("/root/index/scheduleIndex.csv",header = T)
-    df<-data.frame(filename<-schedulerName,location<-"/usr/local/lib/R/site-library/cronR/extdata/",
-                   saveData<-"/usr/local/lib/R/site-library/cronR/extdata/saveData")
+    df<-data.frame(filename=schedulerName,location="/usr/local/lib/R/site-library/cronR/extdata/",
+                   saveData="/usr/local/lib/R/site-library/cronR/extdata/saveData")
+    
+    #df$filename<-schedulerName
+    #df$location<-"/usr/local/lib/R/site-library/cronR/extdata/"
+    #df$saveData<-"/usr/local/lib/R/site-library/cronR/extdata/saveData"
     df<-rbind(st,df)
     
     write.csv(df,"/root/index/scheduleIndex.csv",row.names = F)
-    # rm(df)    
+    rm(df)
+   
+    list(result="success")
+    
 }
   
 #* @get /readSchedulerIndex
@@ -68,20 +74,12 @@ createSchedulerIndex<-function(schedulerName){
 }
 
 
-#* @get /getSchedulerResults
-getSchedulerResults<-function(filename){
+#* @get /readCSV
+readCSVfiles<-function(filename){
+  st<-read.csv(paste("/usr/local/lib/R/site-library/cronR/extdata/saveData/",filename,sep=""),header = T)
   
-  destfile=paste("/usr/local/lib/R/site-library/cronR/extdata/saveData/",filename,sep = "")
-  
-  if(file.exists(destfile)){
-  
-  df<- read.csv(destfile,header = T)
-  toJSON(df)
-  
-  }else{
-    result="nofile"
-  # st<-read.csv(paste("/usr/local/lib/R/site-library/cronR/extdata/saveData/",filename,sep=""),header = T)
-  }
+  toJSON(st)
+  # list(p=st$p,freq=st$freq,Release=st$Release,ClassName=st$ClassName,Graph=st$Graph,Count=st$Count)
 }
 
 
@@ -184,8 +182,8 @@ createRfile<-function(filename,className,endpoint,graph){
 sparlQuery_snapsots_summary_properties<-function(endpoint,className,graph){
   
   tryCatch(
-    ## This is what I want to do:
-    if(is.null(graph)){
+    #
+    if(graph=="NoGraph"){
       
       query<-"SELECT ?p (COUNT(?p) as ?freq) WHERE { ?s ?p ?o. ?s a"
       query<-paste(query,className,sep = " ")

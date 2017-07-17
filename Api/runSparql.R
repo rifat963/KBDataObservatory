@@ -5,7 +5,6 @@ library(cronR)
 #* @get /createCornJob
 createCornJob<-function(filename){
   
-  
   f <- system.file(package = "cronR", "extdata", "sparql.R")
   cmd <- cron_rscript(f)
   # cmd

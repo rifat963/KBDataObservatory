@@ -3,6 +3,20 @@ library(jsonlite)
 library(cronR)
 library(stringr)
 
+#* @get /getSchedulerResults
+getSchedulerResults<-function(filename){
+ destfile=paste("/usr/local/lib/R/site-library/cronR/extdata/saveData/",filename,sep 
+= "")
+  if(file.exists(destfile)){
+  df<- read.csv(destfile,header = T)
+  df$result="file"
+  toJSON(df)
+   }else{
+    dt= data.frame(result="nofile")
+    toJSON(dt)
+  }
+}
+
 #* @get /addSchedulerIndex
 createSchedulerIndex<-function(schedulerName){
   
@@ -224,7 +238,7 @@ sparlQuery_snapsots_summary_properties<-function(endpoint,className,graph){
       query_result <- query_data$results
       
       query_result$Release<- Sys.Date()
-      query_result$ClassName<-className
+      query_result$className<-className
       query_result$Graph<-graph
       
       query_count<-"SELECT count(*)  where{ graph "
