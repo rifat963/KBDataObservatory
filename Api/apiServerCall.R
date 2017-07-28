@@ -5,8 +5,7 @@ library(stringr)
 
 #* @get /addSchedulerIndex
 createSchedulerIndex<-function(schedulerName){
-  
-    
+
     st<-read.csv("/root/index/scheduleIndex.csv",header = T)
     df<-data.frame(filename<-schedulerName,location<-"/usr/local/lib/R/site-library/cronR/extdata/",
                    saveData<-"/usr/local/lib/R/site-library/cronR/extdata/saveData")
@@ -26,11 +25,8 @@ createSchedulerIndex<-function(){
 createSchedulerIndex<-function(schedulerName){
   
   DF<-read.csv("/root/index/scheduleIndex.csv",header = T)
-  
   ind <- which(with( DF, filename==schedulerName))
-  
   DF <- DF[ -ind, ]
-  
   write.csv(data.frame(DF),"/root/index/scheduleIndex.csv",row.names = F)
   rm(DF)    
 }

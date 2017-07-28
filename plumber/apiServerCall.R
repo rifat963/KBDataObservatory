@@ -91,9 +91,8 @@ createSchedulerIndex<-function(schedulerName){
 #* @get /readCSV
 readCSVfiles<-function(schedulerName){
   st<-read.csv(paste("/usr/local/lib/R/site-library/cronR/extdata/saveData/",schedulerName,sep=""),header = T)
-  
   toJSON(st)
-  # list(p=st$p,freq=st$freq,Release=st$Release,ClassName=st$ClassName,Graph=st$Graph,Count=st$Count)
+
 }
 
 
