@@ -9,7 +9,7 @@ R project for monitoring KB changes. Data extraction has been perfom based on an
 To run this api locally on your machine, download R or RStudio and run the following commands once to set up the environment:
 
 ```
-install.packages(c("SPARQL","jsonlite","cronR","stringr"))
+install.packages(c("SPARQL","jsonlite","cronR","stringr","plumber","taskscheduleR"))
 
 ```
 
@@ -19,9 +19,6 @@ All api source code located in plumber folder. To run the server locally you nee
 
 Example APIs are deployed in http://178.62.126.59:9500/. Following we present short summary of the API used in the tool.
 
-
-
-
 **runQury/** 
 
 Input: Class Name, Graph, Sparql Endpoint.
@@ -29,6 +26,7 @@ Input: Class Name, Graph, Sparql Endpoint.
 Process: Extract summary statistics using sparql.
 
 Return: Extracted data in JSON format
+
 
 **getSchedulerResults/**
 

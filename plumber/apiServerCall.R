@@ -2,6 +2,8 @@ library(SPARQL)
 library(jsonlite)
 library(cronR)
 library(stringr)
+library(taskscheduleR)
+
 
 #* @get /getSchedulerResults
 getSchedulerResults<-function(schedulerName){
@@ -77,13 +79,13 @@ createSchedulerIndex<-function(){
 #* @get /updateSchedulerIndex
 createSchedulerIndex<-function(schedulerName){
   
-  DF<-read.csv("/root/index/scheduleIndex.csv",header = T)
+  DF<-read.csv("/root/index/schedulerList.csv",header = T)
   
   ind <- which(with( DF, schedulerName==schedulerName))
   
   DF <- DF[ -ind, ]
   
-  write.csv(data.frame(DF),"/root/index/scheduleIndex.csv",row.names = F)
+  write.csv(data.frame(DF),"/root/index/schedulerList.csv",row.names = F)
   rm(DF)    
 }
 
@@ -103,10 +105,8 @@ createCornJob<-function(schedulerName,freq,time){
   f <- system.file(package = "cronR", "extdata", name)
   cmd <- cron_rscript(f)
   
-  
   if(freq=="minutely")
     cron_add(cmd, frequency = 'minutely', id = schedulerName)
-  
   if(freq=="daily")
     cron_add(cmd, frequency = 'daily', id = schedulerName , at = time)
   if(freq=="hourly")
@@ -163,7 +163,7 @@ createRfile<-function(schedulerName,className,endpoint,graph){
   cat(grp)
   cat("\n")
   # 3cixty Sparql endpoint
-  cat("parm<-paste(\"http://178.62.126.59:8500/\",\"runQuery?schedulerName=\",schedulerName,\"&className=\",
+  cat("parm<-paste(\"http://178.62.126.59:9500/\",\"runQuery?schedulerName=\",schedulerName,\"&className=\",
       className,\"&endpoint=\",endpoint,\"&graph=\",graph,sep = \"\")")  
   cat("\n")
   cat("r<-GET(parm)")   
