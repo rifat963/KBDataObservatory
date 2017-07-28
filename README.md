@@ -9,7 +9,7 @@ R project for monitoring KB changes. Data extraction has been perfom based on an
 To run this api locally on your machine, download R or RStudio and run the following commands once to set up the environment:
 
 ```
-install.packages(c("SPARQL","jsonlite","cronR","stringr","plumber","taskscheduleR"))
+install.packages(c("SPARQL","jsonlite","cronR","stringr","plumber","taskscheduleR","httr"))
 
 ```
 
@@ -17,7 +17,7 @@ All api source code located in plumber folder. To run the server locally you nee
 
 ## APIs 
 
-Example APIs are deployed in http://178.62.126.59:9500/. Following we present short summary of the API used in the tool.
+Example APIs are deployed in http://178.62.126.59:8500/. Following we present short summary of the API used in the tool.
 
 **runQury/** 
 
@@ -27,6 +27,30 @@ Process: Extract summary statistics using sparql.
 
 Return: Extracted data in JSON format
 
+example:
+
+
+```
+# DBpedia Sparql endpoint
+endpoint<-"https://dbpedia.org/sparql"
+
+schedulerName="scheduler_owl"
+endpoint<-"https://dbpedia.org/sparql"
+
+className<-"<http://www.w3.org/2002/07/owl#Class>"
+className<-gsub("#", "%23", className)
+
+graph<-"<http://dbpedia.org/resource/classes#>"
+graph<-gsub("#", "%23", graph)
+
+parm<-paste0("http://178.62.126.59:8500/","runQuery?filename=",filename,"&endpoint=",endpoint,"&graph=",
+            graph,"&className=",className)
+          
+r<-GET(parm)
+
+content(r)
+
+```
 
 **getSchedulerResults/**
 
@@ -36,6 +60,22 @@ Process: Get scheulering result based
 
 Return: Extracted data in JSON format
 
+Example:
+
+```
+schedulerName= "scheduler_event"
+
+parm<-paste("http://178.62.126.59:8500/","readCSV?filename=",schedulerName,".csv",sep = "")
+
+r<-GET(parm)
+
+dt<-content(r)
+
+json_data <- fromJSON(dt[[1]]) 
+
+```
+
+
 **createCornJob/**
 
 Input: Scheduler Name, time and frequency
@@ -44,6 +84,71 @@ Process: Create scheduling task as a corn jon in the server based on the time an
 
 Return: Response as success or error
 
+Example:
+
+```
+# DBpedia Sparql endpoint
+endpoint<-"https://dbpedia.org/sparql"
+
+schedulerName="scheduler_owl"
+endpoint<-"https://dbpedia.org/sparql"
+
+className<-"<http://www.w3.org/2002/07/owl#Class>"
+className<-gsub("#", "%23", className)
+
+graph<-"<http://dbpedia.org/resource/classes#>"
+graph<-gsub("#", "%23", graph)
+
+
+# It is necessary to create the R script before creating the Cron Job in the server
+
+parm<-paste0("http://178.62.126.59:8500/","createRfile?filename=",schedulerName,"&className=",
+                className,"&endpoint=",endpoint,"&graph=",graph)
+    
+responseCreateRfile<-GET(parm)
+resCreateRfileContent<-content(responseCreateRfile)
+
+# In the server duplicate scheduler will generate error. For this before createing scheduler please check current #  # available schedulers.
+
+  parm<-"http://178.62.126.59:8500/readSchedulerIndex"
+  r<-tryCatch(GET(parm), error = function(e) return(NULL))
+  dt<-content(r)
+  DF<-fromJSON(dt[[1]])
+  DF$filename
+
+# Now create the cron job
+
+freq="daily"
+time="14:25:00"
+
+parm<-paste0("http://178.62.126.59:8500/","createCornJob?filename=",schedulerName,"&freq=",
+            freq,"&time=",time)
+r<-GET(parm)
+
+content(r)
+
+```
+
+**getAllCornList/**
+
+
+Input: Scheduler Name
+
+Process: get all the current running schedulers
+
+Return: CronJOb list
+
+```
+
+parm<-"http://178.62.126.59:8500/getAllCornList"
+
+http_status(GET("http://178.62.126.59:8500/getAllCornList"))
+
+r<-GET(parm)
+
+content(r)
+
+```
 
 
 #### Licence
