@@ -17,7 +17,7 @@ All api source code located in plumber folder. To run the server locally you nee
 
 ## APIs 
 
-Example APIs are deployed in http://178.62.126.59:8500/. Following we present short summary of the API used in the tool.
+Example APIs are deployed in http://datascience.ismb.it:9500/. Following we present short summary of the API used in the tool.
 
 **runQury/** 
 
@@ -43,7 +43,7 @@ className<-gsub("#", "%23", className)
 graph<-"<http://dbpedia.org/resource/classes#>"
 graph<-gsub("#", "%23", graph)
 
-parm<-paste0("http://178.62.126.59:8500/","runQuery?filename=",filename,"&endpoint=",endpoint,"&graph=",
+parm<-paste0("http://datascience.ismb.it:9500/","runQuery?filename=",schedulerName,"&endpoint=",endpoint,"&graph=",
             graph,"&className=",className)
           
 r<-GET(parm)
@@ -65,7 +65,7 @@ Example:
 ```
 schedulerName= "scheduler_event"
 
-parm<-paste("http://178.62.126.59:8500/","readCSV?filename=",schedulerName,".csv",sep = "")
+parm<-paste("http://datascience.ismb.it:9500/","readCSV?filename=",schedulerName,".csv",sep = "")
 
 r<-GET(parm)
 
@@ -102,7 +102,7 @@ graph<-gsub("#", "%23", graph)
 
 # It is necessary to create the R script before creating the Cron Job in the server
 
-parm<-paste0("http://178.62.126.59:8500/","createRfile?filename=",schedulerName,"&className=",
+parm<-paste0("http://datascience.ismb.it:9500/","createRfile?filename=",schedulerName,"&className=",
                 className,"&endpoint=",endpoint,"&graph=",graph)
     
 responseCreateRfile<-GET(parm)
@@ -110,7 +110,7 @@ resCreateRfileContent<-content(responseCreateRfile)
 
 # In the server duplicate scheduler will generate error. For this before createing scheduler please check current #  # available schedulers.
 
-  parm<-"http://178.62.126.59:8500/readSchedulerIndex"
+  parm<-"http://datascience.ismb.it:9500//readSchedulerIndex"
   r<-tryCatch(GET(parm), error = function(e) return(NULL))
   dt<-content(r)
   DF<-fromJSON(dt[[1]])
@@ -121,7 +121,7 @@ resCreateRfileContent<-content(responseCreateRfile)
 freq="daily"
 time="14:25:00"
 
-parm<-paste0("http://178.62.126.59:8500/","createCornJob?filename=",schedulerName,"&freq=",
+parm<-paste0("http://datascience.ismb.it:9500/","createCornJob?filename=",schedulerName,"&freq=",
             freq,"&time=",time)
 r<-GET(parm)
 
@@ -140,9 +140,9 @@ Return: CronJOb list
 
 ```
 
-parm<-"http://178.62.126.59:8500/getAllCornList"
+parm<-"http://datascience.ismb.it:9500/getAllCornList"
 
-http_status(GET("http://178.62.126.59:8500/getAllCornList"))
+http_status(GET("http://datascience.ismb.it:9500/getAllCornList"))
 
 r<-GET(parm)
 
@@ -152,5 +152,6 @@ content(r)
 
 
 #### Licence
+
 These scripts are free software; you can redistribute it and/or modify it under the terms of the GNU General Public License published by
 the Free Software Foundation, either version 3 of the License, or (at your option) any later version. See the file Documentation/GPL3 in the original distribution for details. There is ABSOLUTELY NO warranty. 

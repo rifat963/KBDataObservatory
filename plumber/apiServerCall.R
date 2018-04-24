@@ -2,7 +2,7 @@ library(SPARQL)
 library(jsonlite)
 library(cronR)
 library(stringr)
-library(taskscheduleR)
+#library(taskscheduleR)
 
 
 #* @get /getSchedulerResults
@@ -61,31 +61,31 @@ createSchedulerIndex<-function(schedulerName){
 #* @get /addSchedulerIndex
 createSchedulerIndex<-function(schedulerName){
   
-  st<-read.csv("/root/index/scheduleIndex.csv",header = T)
+  st<-read.csv("/srv/shiny-server/KBDataObservetory/schedulerIndex/scheduleIndex.csv",header = T)
   df<-data.frame(schedulerName<-schedulerName,location<-"/usr/local/lib/R/site-library/cronR/extdata/",
                  saveData<-"/usr/local/lib/R/site-library/cronR/extdata/saveData")
   df<-rbind(st,df)
   
-  write.csv(df,"/root/index/scheduleIndex.csv",row.names = F)
+  write.csv(df,"/srv/shiny-server/KBDataObservetory/schedulerIndex/scheduleIndex.csv",row.names = F)
   rm(df)    
 }
 
 #* @get /readSchedulerIndex
 createSchedulerIndex<-function(){
-  st<-read.csv("/root/index/scheduleIndex.csv",header = T)
+  st<-read.csv("/srv/shiny-server/KBDataObservetory/schedulerIndex/scheduleIndex.csv",header = T)
   toJSON(st)    
 }
 
 #* @get /updateSchedulerIndex
 createSchedulerIndex<-function(schedulerName){
   
-  DF<-read.csv("/root/index/schedulerList.csv",header = T)
+  DF<-read.csv("/srv/shiny-server/KBDataObservetory/schedulerIndex/schedulerList.csv",header = T)
   
   ind <- which(with( DF, schedulerName==schedulerName))
   
   DF <- DF[ -ind, ]
   
-  write.csv(data.frame(DF),"/root/index/schedulerList.csv",row.names = F)
+  write.csv(data.frame(DF),"/srv/shiny-server/KBDataObservetory/schedulerIndex/schedulerList.csv",row.names = F)
   rm(DF)    
 }
 
